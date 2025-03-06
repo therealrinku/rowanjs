@@ -13,6 +13,15 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Firebase CLI
+      run: |
+        npm install -g firebase-tools
+
     - name: Authenticate with Firebase
       run: |
         echo "${{ secrets.FIREBASE_CREDENTIALS }}" > firebase-service-account.json
