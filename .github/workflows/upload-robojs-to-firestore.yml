@@ -1,0 +1,24 @@
+name: Upload to Firebase Storage
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Authenticate with Firebase
+      run: |
+        echo "${{ secrets.FIREBASE_CREDENTIALS }}" > firebase-service-account.json
+        firebase use --add
+        firebase login --token ${{ secrets.FIREBASE_TOKEN }}
+
+    - name: Upload files to Firebase Storage
+      run: |
+        firebase storage:upload "../../src/robojs.js" --path "robojs/v0/robojs.js" --token ${{ secrets.FIREBASE_TOKEN }} --force
