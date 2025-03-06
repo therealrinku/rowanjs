@@ -24,8 +24,6 @@ jobs:
 
     - name: Authenticate with Firebase
       run: |
-        echo "${{ secrets.FIREBASE_CREDENTIALS }}" > firebase-service-account.json
-        firebase use --add
         firebase login --token ${{ secrets.FIREBASE_TOKEN }}
 
     - name: Upload files to Firebase Storage
