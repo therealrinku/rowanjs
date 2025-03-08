@@ -24,8 +24,10 @@ jobs:
 
     - name: Authenticate with Firebase
       run: |
-        firebase login --token ${{ secrets.FIREBASE_TOKEN }}
+        echo 'TURNED OFF'
+        # firebase login --token ${{ secrets.FIREBASE_TOKEN }}
 
     - name: Upload files to Firebase Storage
       run: |
-        firebase storage:upload "../../src/robojs.js" --path "robojs/v0/robojs.js" --token ${{ secrets.FIREBASE_TOKEN }} --force
+        echo 'TURNED OFF'
+        # firebase storage:upload "../../src/robojs.js" --path "robojs/v0/robojs.js" --token ${{ secrets.FIREBASE_TOKEN }} --force
