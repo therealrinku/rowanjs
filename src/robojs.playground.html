@@ -3,7 +3,9 @@
     <script defer type="module" src="robojs.js"></script>
   </head>
 
-  <body rjs-state="{ a: 'this is value of a' }">
+  <body rjs-state="{ a: 1 }">
     <button rjs-state-value="a"></button>
+    <button rjs-onclick="a++">Increment</button>
+    <button rjs-onclick="a--">Decrement</button>
   </body>
 </html>

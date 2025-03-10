@@ -25,8 +25,23 @@
         sta.innerHTML = this.state.get(state);
       });
     }
+
+    listenForStateChangesOnClick() {
+      const elements = document.querySelectorAll("[rjs-onclick]");
+
+      for (const element of elements) {
+        element.addEventListener("click", (_) => {
+          const evalCode = element.getAttribute("rjs-onclick");
+          let a = this.state.get("a"); // HOW TO GET THIS DYNAMICALLY ???? i got no fking clue rn
+          eval(evalCode); // UNSAFE ??? most likely 
+          this.state.set("a", a);
+          this.updateState();
+        });
+      }
+    }
   }
   const sm = new StateManager();
   sm.initializeState();
   sm.updateState();
+  sm.listenForStateChangesOnClick();
 })();
