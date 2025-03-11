@@ -1,15 +1,20 @@
 <html>
   <head>
     <script defer type="module" src="robojs.js"></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   </head>
 
-  <body rjs-state="{ a: 1, b: 20 }">
-    <button rjs-state-value="a"></button>
-    <button rjs-onclick="a++">Increment</button>
-    <button rjs-onclick="a--">Decrement</button>
+  <body rjs-state="{ a: 1, b: 20 }" class="flex flex-col items-center justify-center h-screen w-screen">
+    <div class="flex items-center gap-2">
+      <button rjs-onclick="a++" class="bg-green-500 text-white px-3 py-1 rounded">+</button>
+      <button rjs-state-value="a" class="border rounded px-3 py-1"></button>
+      <button rjs-onclick="a--" class="bg-red-500 text-white px-3 py-1 rounded">-</button>
+    </div>
 
-    <button rjs-state-value="b"></button>
-    <button rjs-onclick="b++">Increment</button>
-    <button rjs-onclick="b--">Decrement</button>
+    <div class="flex items-center gap-2 mt-3">
+      <button rjs-onclick="b++" class="bg-green-500 text-white px-3 py-1 rounded">+</button>
+      <button rjs-state-value="b" class="border rounded px-3 py-1"></button>
+      <button rjs-onclick="b--" class="bg-red-500 text-white px-3 py-1 rounded">-</button>
+    </div>
   </body>
 </html>
