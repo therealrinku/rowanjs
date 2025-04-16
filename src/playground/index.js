@@ -1,19 +1,14 @@
 (async function () {
-  const { State, DOMElement }  = window.rowanjs;
+  const { State, DOMElement } = window.rowanjs;
   const root = DOMElement("div");
-  root.addStyles({ backgroundColor: "white", height: "100vh", width: "100%" });
+  root.addClass("bg-white h-[100vh] w-full");
   root.createRoot();
 
   function createSidebar() {
     const sidebar = DOMElement("div");
-    // sidebar.addClass("bg-gray-500 w-[15vw] h-[100vh]");
-
-    sidebar.addStyles({
-      backgroundColor: "rgba(0,0,0,0.5)",
-      width: "15vw",
-      height: "100vh",
-    });
-
+    sidebar.addClass(
+      "bg-gray-700 w-[15vw] h-[100vh] p-2 flex flex-col gap-2 text-white",
+    );
     root.append(sidebar);
     return sidebar;
   }
@@ -25,28 +20,26 @@
   bojor.set({ name: "Alex", lastName: "Hermozi", company: { name: "lms" } });
 
   const button = DOMElement("button");
-  button.setText("increment a");
+  button.setText("increment count");
+  button.addClass("bg-green-500 px-5 py-1 text-white");
   button.onClick(() => a.set(a.get() + 1));
   sidebar.append(button);
 
   const button2 = DOMElement("button");
+  button2.addClass("bg-green-500 px-5 py-1 text-white");
   button2.setText("update bojor");
   button2.onClick(() =>
     bojor.set({ ...bojor.get(), company: { name: "GOOGL" } }),
   );
   sidebar.append(button2);
 
-  const span = DOMElement("span");
-  span.addStyles({ color: "white", display: "flex", gap: "4px" });
-  sidebar.append(span);
-
   const text = DOMElement("p");
   text.setText(["Count is:", a]).addDep(a);
-  span.append(text);
+  sidebar.append(text);
 
   const anothertext = DOMElement("p");
   const ist = State(bojor.get().company.name);
   anothertext.setText(ist);
   anothertext.addDep(bojor);
-  span.append(anothertext);
+  sidebar.append(anothertext);
 })();
