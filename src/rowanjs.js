@@ -1,61 +1,122 @@
-(function robojs() {
-  class StateManager {
-    constructor() {
-      this.state = new Map();
-    }
+class State {
+  constructor(value) {
+    this.state = value;
+    this.subscribers = new Array();
+  }
 
-    initializeState() {
-      const definedStates = document.querySelectorAll("[rjs-state]");
-      definedStates.forEach((ds) => {
-        let state = ds.getAttribute("rjs-state");
-        state = state.replace(/'([^']+)'/g, '"$1"');
-        state = state.replace(/([a-zA-Z0-9_]+)(?=\s*:)/g, '"$1"');
-        const obj = JSON.parse(state);
+  __subscribe(elem) {
+    this.subscribers.push(elem);
+  }
 
-        for (const key in obj) {
-          this.state.set(key, obj[key]);
-        }
+  __publish() {
+    for (const subscriber of this.subscribers) {
+      const v = subscriber.texts.map((txt) => {
+        return txt instanceof State ? txt.get() : txt;
       });
-    }
-
-    updateState() {
-      const statesToAdd = document.querySelectorAll("[rjs-state-value]");
-      statesToAdd.forEach((sta) => {
-        const state = sta.getAttribute("rjs-state-value");
-        sta.innerHTML = this.state.get(state);
-      });
-    }
-
-    listenForStateChangesOnClick() {
-      const elements = document.querySelectorAll("[rjs-onclick]");
-
-      for (const element of elements) {
-        element.addEventListener("click", (_) => {
-          const evalCode = element.getAttribute("rjs-onclick");
-          const stateKey = this._extractStateKeyFromCode(evalCode);
-          const stateValue = this.state.get(stateKey);
-
-          window[stateKey] = stateValue; // leveraging window object here
-          eval(evalCode); // very very unsafe code
-
-          this.state.set(stateKey, window[stateKey]);
-          delete window[stateKey];
-
-          this.updateState();
-        });
-      }
-    }
-
-    _extractStateKeyFromCode(code) {
-      //idk wth this regex is doing
-      const match = code.match(
-        /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?=[\+\-\*\/\=\!%&\|\^]|$)/,
-      );
-      return match ? match[1] : null;
+      console.log(subscriber.innerText, v);
+      subscriber.innerText = v.join(" ");
     }
   }
-  const sm = new StateManager();
-  sm.initializeState();
-  sm.updateState();
-  sm.listenForStateChangesOnClick();
-})();
+
+  get() {
+    return this.state;
+  }
+
+  set(value) {
+    this.state = value;
+    this.__publish();
+  }
+}
+
+class DOMElement {
+  constructor(elem) {
+    this.htmlelement = document.createElement(elem);
+  }
+
+  setText(v) {
+    if (Array.isArray(v)) {
+      v.forEach((p) => this.setText(p));
+      return this;
+    }
+
+    if (!this.htmlelement.texts) {
+      this.htmlelement.texts = [];
+    }
+
+    this.htmlelement.texts.push(v);
+
+    const renderedText = this.htmlelement.texts
+      .map((txt) => (txt instanceof State ? txt.get() : txt))
+      .join(" ");
+
+    this.htmlelement.innerText = renderedText;
+    return this;
+  }
+
+  addClass(classNames) {
+    classNames = classNames.split(" ");
+    this.htmlelement.classList.add(...classNames);
+    return this;
+  }
+
+  addDep(deps) {
+    deps = Array.isArray(deps) ? deps : [deps];
+    for (const dep of deps) {
+      dep.__subscribe(this.htmlelement);
+    }
+    return this;
+  }
+
+  onClick(callbackFn) {
+    this.htmlelement.onclick = callbackFn;
+    return this;
+  }
+
+  addStyles(stylesObj) {
+    const styles = Object.entries(stylesObj);
+    for (const s of styles) {
+      const [key, value] = s;
+      this.htmlelement.style[key] = value;
+    }
+    return this;
+  }
+
+  setAttribute(name, value) {
+    this.htmlelement.setAttribute(name, value);
+    return this;
+  }
+
+  createRoot() {
+    document.body.appendChild(this.htmlelement);
+    return this;
+  }
+
+  append(child) {
+    this.htmlelement.appendChild(child.htmlelement);
+    return this;
+  }
+}
+
+function deep(s, key, node) {
+  if ((!s) instanceof State) {
+    throw new Error(`deep only takes instances of State`);
+  }
+
+  const k = key.split(".");
+
+  let state = s.state;
+
+  k.forEach((p) => {
+    state = state[p];
+  });
+  const stt = new State(state);
+  node.setText(stt);
+}
+
+const rowanDotJs = {
+  deep,
+  DOMElement: (elem) => new DOMElement(elem),
+  State: (value) => new State(value),
+};
+
+export default rowanDotJs;
