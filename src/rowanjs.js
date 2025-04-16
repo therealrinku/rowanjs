@@ -97,26 +97,9 @@ class DOMElement {
   }
 }
 
-function deep(s, key, node) {
-  if ((!s) instanceof State) {
-    throw new Error(`deep only takes instances of State`);
-  }
-
-  const k = key.split(".");
-
-  let state = s.state;
-
-  k.forEach((p) => {
-    state = state[p];
-  });
-  const stt = new State(state);
-  node.setText(stt);
-}
-
 const rowanjs = {
-  deep,
-  DOMElement: (elem) => new DOMElement(elem),
-  State: (value) => new State(value),
+  element: (elem) => new DOMElement(elem),
+  state: (value) => new State(value),
 };
 
 window.rowanjs = rowanjs;
