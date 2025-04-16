@@ -113,10 +113,10 @@ function deep(s, key, node) {
   node.setText(stt);
 }
 
-const rowanDotJs = {
+const rowanjs = {
   deep,
   DOMElement: (elem) => new DOMElement(elem),
   State: (value) => new State(value),
 };
 
-export default rowanDotJs;
+window.rowanjs = rowanjs;

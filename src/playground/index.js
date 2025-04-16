@@ -1,7 +1,5 @@
-import rowanjs from "https://raw.githubusercontent.com/therealrinku/rowanjs/refs/heads/main/src/rowanjs.js";
-
 (async function () {
-  const { State, DOMElement }  = rowanjs;
+  const { State, DOMElement }  = window.rowanjs;
   const root = DOMElement("div");
   root.addStyles({ backgroundColor: "white", height: "100vh", width: "100%" });
   root.createRoot();
