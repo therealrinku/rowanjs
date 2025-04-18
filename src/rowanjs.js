@@ -72,8 +72,8 @@ class DOMElement {
   }
 
   __paint() {
-    console.log("repainting", this.htmlelement);
     const texts = [];
+
     this.textNodes.forEach((node) => {
       if (typeof node === "object") {
         const { state, key } = node;
