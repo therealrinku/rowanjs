@@ -34,8 +34,8 @@ class State {
           const props = key.split(".");
 
           props.forEach((prop) => {
-            lv = lv[prop];
-            nv = nv[prop];
+            lv = lv?.[prop];
+            nv = nv?.[prop];
           });
 
           publishable = lv !== nv && publishable;
