@@ -129,11 +129,11 @@ class DOMElement {
 
     v.state.__subscribe({
       callback: () => {
-        this.htmlelement.style.display = v.fn() ? "block" : "none";
+        this.htmlelement.style.display = v.fn() ? "flex" : "none";
       },
     });
 
-    this.htmlelement.style.display = v.fn() ? "block" : "none";
+    this.htmlelement.style.display = v.fn() ? "flex" : "none";
   }
 
   addClass(classNames) {
