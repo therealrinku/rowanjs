@@ -23,19 +23,27 @@
   bojor.set({ name: "Alex", lastName: "Hermozi", company: { name: "lms" } });
 
   const button = element("button");
-  button.setText("increment count");
+  button.setText("toggle hola mundo");
   button.addClass("bg-green-500 px-5 py-1 text-white");
   button.onClick(() => a.set(a.get() + 1));
   sidebar.append(button);
 
+  const showhola = state({show: false});
+    
   const button2 = element("button");
   button2.addClass("bg-green-500 px-5 py-1 text-white");
   // button2.onClick(()=>bojor.set({...bojor.get(), name:"Poops"}))
-  button2.onClick(() =>
-    bojor.set({ ...bojor.get(), company: { name: "algolia" } }),
-  );
+  // button2.onClick(() =>
+  //   bojor.set({ ...bojor.get(), company: { name: "algolia" } }),
+  // );
+  button2.onClick(()=>showhola.set({show: !showhola.get().show}))
   button2.setText("fetch users");
   sidebar.append(button2);
+  
+  const jpt = element("p");
+  jpt.setText("hola mundo");
+  jpt.showIf({ state: showhola, fn: () => showhola.get().show === true});
+  sidebar.append(jpt);
 
   const text = element("p");
   text.setText(["Count is:", { state: bojor, key: "company.name" }]);

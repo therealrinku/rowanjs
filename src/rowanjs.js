@@ -9,10 +9,11 @@ class State {
   }
 
   __subscribe(elem) {
+    console.log(elem, "sub");
     this.subscribers.push(elem);
   }
 
-  __isPublishable(lastState, newState) {
+  __unused_isPublishable(lastState, newState) {
     if (this.subscribers.length === 0) {
       return false;
     }
@@ -49,19 +50,17 @@ class State {
   }
 
   __publish() {
-    this.subscribers.forEach((sub) => {
-      sub.__paint();
-    });
+    this.subscribers.forEach((sub) => sub.callback());
   }
 
   set(value) {
     const oldState = this.state;
     this.state = value;
 
-    const publishable = this.__isPublishable(oldState, value);
-    if (publishable) {
-      this.__publish();
-    }
+    // const publishable = this.__isPublishable(oldState, value);
+    // if (publishable) {
+    this.__publish();
+    // }
   }
 }
 
@@ -108,7 +107,8 @@ class DOMElement {
       if ((!state) instanceof State) {
         throw new Error("Invalid state given", this.htmlelement);
       }
-      state.__subscribe(this);
+
+      state.__subscribe({ callback: () => this.__paint() });
       this.textNodes.push({ state, key });
     } else {
       this.textNodes.push(t);
@@ -116,6 +116,24 @@ class DOMElement {
 
     this.__paint();
     return this;
+  }
+
+  showIf(v) {
+    if (typeof v !== "object" && !(v instanceof State)) {
+      throw new Error("showIf method only takes instance of state");
+    }
+
+    if (typeof v === "object" && !(v.state instanceof State)) {
+      throw new Error("showIf method only takes instance of state");
+    }
+
+    v.state.__subscribe({
+      callback: () => {
+        this.htmlelement.style.display = v.fn() ? "block" : "none";
+      },
+    });
+
+    this.htmlelement.style.display = v.fn() ? "block" : "none";
   }
 
   addClass(classNames) {
