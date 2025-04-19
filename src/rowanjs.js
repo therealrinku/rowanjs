@@ -127,13 +127,11 @@ class DOMElement {
       throw new Error("showIf method only takes instance of state");
     }
 
-    v.state.__subscribe({
-      callback: () => {
-        this.htmlelement.style.display = v.fn() ? "flex" : "none";
-      },
-    });
+    const fn = () =>
+      (this.htmlelement.style.display = v.fn() ? "flex" : "none");
 
-    this.htmlelement.style.display = v.fn() ? "flex" : "none";
+    v.state.__subscribe({ callback: fn });
+    fn();
   }
 
   addClass(classNames) {
