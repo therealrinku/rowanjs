@@ -1,3 +1,47 @@
+class Component {
+  constructor(fn) {
+    this.component = fn();
+    this.componentFn = fn;
+  }
+
+  append(...elements) {
+    elements.forEach((element) => {
+      if(!(element instanceof Component)){
+        throw new Error("append() method only takes Component as an argument.");
+      }
+
+      this.component.htmlelement.appendChild(element.get().htmlelement);
+    });
+    return this;
+  }
+
+  get() {
+    return this.component;
+  }
+
+  #rerender() {
+    const parentElement = this.component.htmlelement.parentElement;
+    const originalElement = this.component.htmlelement;
+    
+    this.component = this.componentFn();
+    
+    if (parentElement) {
+      parentElement.replaceChild(this.component.htmlelement, originalElement);
+    }
+  }
+
+  addDep(...states) {
+    // TODO: add ability to add granular dependecies
+    states.forEach((state) => {
+      if (!(state instanceof State)) {
+        throw new Error("addDep() method only takes State as an argument.");
+      }
+
+      state.subscribe({ callback: () => this.#rerender() });
+    });
+  }
+}
+
 class State {
   constructor(value) {
     this.state = value;
@@ -8,48 +52,13 @@ class State {
     return this.state;
   }
 
-  __subscribe(elem) {
-    console.log(elem, "sub");
+  subscribe(elem) {
+    // TODO: ability to subscribe to inner properties changes only
     this.subscribers.push(elem);
   }
 
-  __unused_isPublishable(lastState, newState) {
-    if (this.subscribers.length === 0) {
-      return false;
-    }
-
-    let publishable = true;
-
-    this.subscribers.forEach((sub) => {
-      sub.textNodes.forEach((node) => {
-        if (typeof node === "object") {
-          const { state, key } = node;
-
-          if (!key) {
-            publishable = lastState !== newState && publishable;
-          }
-
-          let lv = lastState;
-          let nv = newState;
-
-          const props = key.split(".");
-
-          props.forEach((prop) => {
-            lv = lv?.[prop];
-            nv = nv?.[prop];
-          });
-
-          publishable = lv !== nv && publishable;
-        } else {
-          publishable = lastState !== newState && publishable;
-        }
-      });
-    });
-
-    return publishable;
-  }
-
-  __publish() {
+  #publish() {
+    // TODO: publish only when specified inner properties changes if provided
     this.subscribers.forEach((sub) => sub.callback());
   }
 
@@ -57,81 +66,30 @@ class State {
     const oldState = this.state;
     this.state = value;
 
-    // const publishable = this.__isPublishable(oldState, value);
-    // if (publishable) {
-    this.__publish();
-    // }
+    this.#publish();
   }
 }
 
 class DOMElement {
   constructor(elem) {
     this.htmlelement = document.createElement(elem);
-    this.textNodes = new Array();
   }
 
-  __paint() {
-    const texts = [];
-
-    this.textNodes.forEach((node) => {
-      if (typeof node === "object") {
-        const { state, key } = node;
-        if (!key) {
-          texts.push(state.get());
-        } else {
-          const props = key.split(".");
-          let val = state.get();
-
-          for (const prop of props) {
-            val = val[prop];
-          }
-
-          texts.push(val);
-        }
-      } else {
-        texts.push(node);
-      }
+  setText(...t) {
+    t.forEach((txt) => {
+      this.htmlelement.innerText += txt;
     });
-
-    this.htmlelement.innerText = texts.join(" ");
-  }
-
-  setText(t) {
-    if (Array.isArray(t)) {
-      t.forEach((txt) => this.setText(txt));
-      return this;
-    }
-
-    if (typeof t === "object") {
-      const { state, key } = t;
-      if ((!state) instanceof State) {
-        throw new Error("Invalid state given", this.htmlelement);
-      }
-
-      state.__subscribe({ callback: () => this.__paint() });
-      this.textNodes.push({ state, key });
-    } else {
-      this.textNodes.push(t);
-    }
-
-    this.__paint();
     return this;
   }
 
-  showIf(v) {
-    if (typeof v !== "object" && !(v instanceof State)) {
-      throw new Error("showIf method only takes instance of state");
+  showIf(fn) {
+    if (typeof fn !== "function") {
+      throw new Error("showIf() only takes function argument.");
     }
 
-    if (typeof v === "object" && !(v.state instanceof State)) {
-      throw new Error("showIf method only takes instance of state");
-    }
-
-    const fn = () =>
-      (this.htmlelement.style.display = v.fn() ? "flex" : "none");
-
-    v.state.__subscribe({ callback: fn });
-    fn();
+    // TODO: make it better?
+    this.htmlelement.innerHTML = fn() ? true : false;
+    return this;
   }
 
   addClass(classNames) {
@@ -171,6 +129,7 @@ class DOMElement {
 }
 
 const rowanjs = {
+  component: (fn) => new Component(fn),
   element: (elem) => new DOMElement(elem),
   state: (value) => new State(value),
 };
