@@ -4,7 +4,7 @@ class Component {
     this.componentFn = fn;
   }
 
-  append(...elements) {
+  appendElement(...elements) {
     elements.forEach((element) => {
       if(!(element instanceof Component)){
         throw new Error("append() method only takes Component as an argument.");
