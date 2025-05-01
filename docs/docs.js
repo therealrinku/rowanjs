@@ -6,6 +6,7 @@ import { topbar } from "./components/topbar.js";
 import { stateDocs } from "./components/state-docs.js";
 import { elementDocs } from "./components/element-docs.js";
 import { componentDocs } from "./components/component-docs.js";
+import { installationDocs } from "./components/installation-docs.js";
 
 const root = component(() => {
   const rootElem = element("div");
@@ -26,8 +27,9 @@ sidebar.addDep(selectedDocItem);
 elementDocs.addDep(selectedDocItem);
 stateDocs.addDep(selectedDocItem);
 componentDocs.addDep(selectedDocItem);
+installationDocs.addDep(selectedDocItem);
 
-main.appendElement(elementDocs, stateDocs, componentDocs);
+main.appendElement(elementDocs, stateDocs, componentDocs, installationDocs);
 root.appendElement(sidebar, main, topbar);
 
 root.get().createRoot();

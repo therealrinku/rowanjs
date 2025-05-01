@@ -1,3 +1,3 @@
 const { state } = window.rowanjs;
 
-export const selectedDocItem = state("Component");
+export const selectedDocItem = state("Installation");

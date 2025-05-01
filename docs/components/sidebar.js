@@ -2,7 +2,7 @@ const { element, component } = window.rowanjs;
 import { selectedDocItem } from "../state-store.js";
 
 const sidebarData = {
-  Core: ["Component", "State", "Element"],
+  Core: ["Installation", "Component", "State", "Element"],
   "Component API": ["appendElement()", "getElement()", "addDep()"],
   "State API": ["set()", "get()"],
   "Element API": [
