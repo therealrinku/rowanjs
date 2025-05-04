@@ -116,7 +116,7 @@ class DOMElement {
   }
 
   onChange(callbackFn) {
-    this.htmlelement.onclick = callbackFn;
+    this.htmlelement.onchange = callbackFn;
     return this;
   }
 

@@ -1,6 +1,6 @@
 const { element, component } = window.rowanjs;
 
-import { selectedDocItem } from "./state-store.js";
+import { selectedDocItem, searchState } from "./state-store.js";
 import { sidebar } from "./components/sidebar.js";
 import { topbar } from "./components/topbar.js";
 import { stateDocs } from "./components/state-docs.js";
@@ -23,7 +23,7 @@ const main = component(() => {
   return mainElem;
 });
 
-sidebar.addDep(selectedDocItem);
+sidebar.addDep(selectedDocItem, searchState);
 elementDocs.addDep(selectedDocItem);
 stateDocs.addDep(selectedDocItem);
 componentDocs.addDep(selectedDocItem);

@@ -1,5 +1,6 @@
-const { element, component } = window.rowanjs;
+const { element, component, state } = window.rowanjs;
 import { selectedDocItem } from "../state-store.js";
+import { searchState } from "../state-store.js";
 
 const sidebarData = {
   Core: ["Installation", "Component", "State", "Element"],
@@ -44,9 +45,35 @@ export const sidebar = component(() => {
     "w-[18%] min-h-screen max-h-screen overflow-y-auto max-w-[300px] bg-gray-300 pt-16 px-5 flex flex-col gap-3 py-5",
   );
 
-  for (const [section, buttons] of Object.entries(sidebarData)) {
-    createAndAppendSection(section, sidebarElem);
-    buttons.forEach((title) => createAndAppendDocButton(title, sidebarElem));
+  const input = element("input");
+  input.setValue(searchState.get());
+  input.onChange((e) => searchState.set(e.target.value));
+  input.setAttribute("placeholder", "search...");
+  input.addClass("border border-gray-500 w-full min-h-12 max-h-12 outline-none px-2");
+  sidebarElem.append(input);
+
+  const filteredSidebarData = Object.entries(sidebarData).map((obj) => {
+    const title = obj[0];
+    const sectionTitles = obj[1];
+
+    const filteredSectionTitles = [...sectionTitles].filter((sectionTitle) => {
+      if (
+        sectionTitle.toLowerCase().includes(searchState.get().toLowerCase())
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+    return [title, filteredSectionTitles];
+  });
+
+  for (const [section, buttons] of filteredSidebarData) {
+    if (buttons.length > 0) {
+      createAndAppendSection(section, sidebarElem);
+      buttons.forEach((title) => createAndAppendDocButton(title, sidebarElem));
+    }
   }
 
   return sidebarElem;
