@@ -6,7 +6,7 @@ class Component {
 
   appendElement(...elements) {
     elements.forEach((element) => {
-      if(!(element instanceof Component)){
+      if (!(element instanceof Component)) {
         throw new Error("append() method only takes Component as an argument.");
       }
 
@@ -22,11 +22,19 @@ class Component {
   #rerender() {
     const parentElement = this.component.htmlelement.parentElement;
     const originalElement = this.component.htmlelement;
-    
+
+    //preserve useful states from last render
+    const scrollTop = this.component.htmlelement.scrollTop;
+    const scrollLeft = this.component.htmlelement.scrollLeft;
+
     this.component = this.componentFn();
-    
     if (parentElement) {
       parentElement.replaceChild(this.component.htmlelement, originalElement);
+      //apply last useful states
+      requestAnimationFrame(() => {
+        this.component.htmlelement.scrollTop = scrollTop;
+        this.component.htmlelement.scrollLeft = scrollLeft;
+      });
     }
   }
 
@@ -98,7 +106,16 @@ class DOMElement {
     return this;
   }
 
+  setValue(value) {
+    this.htmlelement.value = value;
+  }
+
   onClick(callbackFn) {
+    this.htmlelement.onclick = callbackFn;
+    return this;
+  }
+
+  onChange(callbackFn) {
     this.htmlelement.onclick = callbackFn;
     return this;
   }
