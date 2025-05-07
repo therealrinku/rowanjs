@@ -124,7 +124,7 @@ class Element {
 }
 
 const rowanjs = {
-  element: (elem) => new element(elem),
+  element: (elem) => new Element(elem),
   state: (value) => new State(value),
 };
 
