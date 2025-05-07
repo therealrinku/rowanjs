@@ -29,7 +29,7 @@ function createAndAppendSection(title, root) {
 function createAndAppendDocButton(title, root) {
   const elem = element("button");
   elem.setText(title);
-  elem.setEventListener("onclick", () => selectedDocItem.set(title));
+  elem.addEventListener("onclick", () => selectedDocItem.set(title));
 
   const active = selectedDocItem.get() === title;
   if (active) {
