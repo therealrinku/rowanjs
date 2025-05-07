@@ -1,55 +1,3 @@
-class Component {
-  constructor(fn) {
-    this.component = fn();
-    this.componentFn = fn;
-  }
-
-  appendElement(...elements) {
-    elements.forEach((element) => {
-      if (!(element instanceof Component)) {
-        throw new Error("append() method only takes Component as an argument.");
-      }
-
-      this.component.htmlelement.appendChild(element.get().htmlelement);
-    });
-    return this;
-  }
-
-  get() {
-    return this.component;
-  }
-
-  #rerender() {
-    const parentElement = this.component.htmlelement.parentElement;
-    const originalElement = this.component.htmlelement;
-
-    //preserve useful states from last render
-    const scrollTop = this.component.htmlelement.scrollTop;
-    const scrollLeft = this.component.htmlelement.scrollLeft;
-
-    this.component = this.componentFn();
-    if (parentElement) {
-      parentElement.replaceChild(this.component.htmlelement, originalElement);
-      //apply last useful states
-      requestAnimationFrame(() => {
-        this.component.htmlelement.scrollTop = scrollTop;
-        this.component.htmlelement.scrollLeft = scrollLeft;
-      });
-    }
-  }
-
-  addDep(...states) {
-    // TODO: add ability to add granular dependecies
-    states.forEach((state) => {
-      if (!(state instanceof State)) {
-        throw new Error("addDep() method only takes State as an argument.");
-      }
-
-      state.subscribe({ callback: () => this.#rerender() });
-    });
-  }
-}
-
 class State {
   constructor(value) {
     this.state = value;
@@ -78,9 +26,39 @@ class State {
   }
 }
 
-class DOMElement {
+class Element {
   constructor(elem) {
     this.htmlelement = document.createElement(elem);
+  }
+
+  #rerender() {
+    const parentElement = this.htmlelement.parentElement;
+    const originalElement = this.htmlelement;
+
+    //preserve useful states from last render
+    const scrollTop = this.htmlelement.scrollTop;
+    const scrollLeft = this.htmlelement.scrollLeft;
+
+    this.component = this.componentFn();
+    if (parentElement) {
+      parentElement.replaceChild(this.htmlelement, originalElement);
+      //apply last useful states
+      requestAnimationFrame(() => {
+        this.htmlelement.scrollTop = scrollTop;
+        this.htmlelement.scrollLeft = scrollLeft;
+      });
+    }
+  }
+
+  addDep(...states) {
+    // TODO: add ability to add granular dependecies
+    states.forEach((state) => {
+      if (!(state instanceof State)) {
+        throw new Error("addDep() method only takes State as an argument.");
+      }
+
+      state.subscribe({ callback: () => this.#rerender() });
+    });
   }
 
   setText(...t) {
@@ -146,8 +124,7 @@ class DOMElement {
 }
 
 const rowanjs = {
-  component: (fn) => new Component(fn),
-  element: (elem) => new DOMElement(elem),
+  element: (elem) => new element(elem),
   state: (value) => new State(value),
 };
 
