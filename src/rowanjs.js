@@ -30,9 +30,11 @@ class Element {
   constructor(name) {
     this.model = {
       node: document.createElement(name),
-      children: [],
-      attributes: [],
-      eventListeners: []
+      children: new Array(),
+      attributes: new Map(),
+      eventListeners: new Map(),
+      classNames: new Set(),
+      styles: new Map()
     };
   }
 
@@ -51,8 +53,8 @@ class Element {
       parentElement.replaceChild(this.component, originalElement);
 
       requestAnimationFrame(() => {
-        this.htmlelement.scrollTop = scrollTop;
-        this.htmlelement.scrollLeft = scrollLeft;
+        this.model.node.scrollTop = scrollTop;
+        this.model.node.scrollLeft = scrollLeft;
       });
     }
   }
@@ -66,12 +68,15 @@ class Element {
 
       state.subscribe({ callback: () => this.#rerender() });
     });
+
+    return this;
   }
 
   setText(...t) {
     t.forEach((txt) => {
       this.model.node.innerText += txt;
     });
+
     return this;
   }
 
@@ -88,44 +93,47 @@ class Element {
   addClass(classNames) {
     classNames = classNames.split(" ");
     this.model.node.classList.add(...classNames);
-    return this;
-  }
+    this.model.classNames.add(...classNames);
 
-  setValue(value) {
-    this.model.node.value = value;
-  }
-
-  onClick(callbackFn) {
-    this.mode.node.onclick = callbackFn;
-    return this;
-  }
-
-  onChange(callbackFn) {
-    this.model.node.onchange = callbackFn;
     return this;
   }
 
   addStyles(stylesObj) {
     const styles = Object.entries(stylesObj);
+
     for (const s of styles) {
       const [key, value] = s;
       this.model.node.style[key] = value;
+      this.model.styles.set(key, value);
     }
+
     return this;
   }
 
   setAttribute(name, value) {
     this.model.node.setAttribute(name, value);
+    this.model.attributes.set(name, value);
+
+    return this;
+  }
+
+  addEventListener(event, callback){
+    this.model.node.addEventListener(event, callback);
+    this.model.eventListeners.set(event, callback);
+
     return this;
   }
 
   createRoot() {
     document.body.appendChild(this.model.node);
+
     return this;
   }
 
   append(child) {
     this.model.node.appendChild(child.model.node);
+    this.model.children.push(child);
+    
     return this;
   }
 }
