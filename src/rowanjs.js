@@ -22,6 +22,22 @@ class Component {
     this.#applyDiff(diff);
   }
 
+  get(){
+    return this;
+  }
+
+  appendElement(...elements) {
+    elements.forEach((element) => {
+      if (!(element instanceof Component)) {
+        throw new Error("append() method only takes Component as an argument.");
+      }
+
+      this.component.model.node.appendChild(element.get().component.model.node);
+      this.component.model.children.push(element.get().component.model.node);
+    });
+    return this;
+  }
+
   addDep(...states) {
     states.forEach((state) => {
       if (!(state instanceof State)) {
