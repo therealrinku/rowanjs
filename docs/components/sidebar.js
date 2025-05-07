@@ -29,7 +29,7 @@ function createAndAppendSection(title, root) {
 function createAndAppendDocButton(title, root) {
   const elem = element("button");
   elem.setText(title);
-  elem.onClick(() => selectedDocItem.set(title));
+  elem.setEventListener("onclick", () => selectedDocItem.set(title));
 
   const active = selectedDocItem.get() === title;
   if (active) {
@@ -46,10 +46,12 @@ export const sidebar = component(() => {
   );
 
   const input = element("input");
-  input.setValue(searchState.get());
-  input.onChange((e) => searchState.set(e.target.value));
+  input.setAttribute("value", searchState.get());
+  input.addEventListener("onchange", (e) => searchState.set(e.target.value));
   input.setAttribute("placeholder", "search...");
-  input.addClass("border border-gray-500 w-full min-h-12 max-h-12 outline-none px-2");
+  input.addClass(
+    "border border-gray-500 w-full min-h-12 max-h-12 outline-none px-2",
+  );
   sidebarElem.append(input);
 
   const filteredSidebarData = Object.entries(sidebarData).map((obj) => {
