@@ -1,3 +1,40 @@
+class Component {
+  constructor(fn) {
+    this.component = fn();
+    this.fn = fn;
+  }
+
+  #applyDiff() {}
+
+  #findDiff() {
+    // #no fucking clue
+    const last = this.component.model;
+    const current = this.fn();
+
+    const diff = {};
+
+    //calculate diff
+    return diff;
+  }
+
+  #rerender() {
+    const diff = this.#findDiff();
+    this.#applyDiff(diff);
+  }
+
+  addDep(...states) {
+    states.forEach((state) => {
+      if (!(state instanceof State)) {
+        throw new Error("addDep() method only takes State as an argument.");
+      }
+
+      state.subscribe({ callback: () => this.#rerender() });
+    });
+
+    return this;
+  }
+}
+
 class State {
   constructor(value) {
     this.state = value;
@@ -34,42 +71,8 @@ class Element {
       attributes: new Map(),
       eventListeners: new Map(),
       classNames: new Set(),
-      styles: new Map()
+      styles: new Map(),
     };
-  }
-
-  #rerender() {
-    const { node } = this.model;
-    const parentElement = node.parentElement;
-    const originalElement = node;
-
-    //preserve useful states from last render
-    const scrollTop = node.scrollTop;
-    const scrollLeft = node.scrollLeft;
-
-    this.component = this.componentFn();
-
-    if (parentElement) {
-      parentElement.replaceChild(this.component, originalElement);
-
-      requestAnimationFrame(() => {
-        this.model.node.scrollTop = scrollTop;
-        this.model.node.scrollLeft = scrollLeft;
-      });
-    }
-  }
-
-  addDep(...states) {
-    // TODO: add ability to add granular dependecies
-    states.forEach((state) => {
-      if (!(state instanceof State)) {
-        throw new Error("addDep() method only takes State as an argument.");
-      }
-
-      state.subscribe({ callback: () => this.#rerender() });
-    });
-
-    return this;
   }
 
   setText(...t) {
@@ -117,7 +120,7 @@ class Element {
     return this;
   }
 
-  addEventListener(event, callback){
+  addEventListener(event, callback) {
     this.model.node.addEventListener(event, callback);
     this.model.eventListeners.set(event, callback);
 
@@ -133,12 +136,13 @@ class Element {
   append(child) {
     this.model.node.appendChild(child.model.node);
     this.model.children.push(child);
-    
+
     return this;
   }
 }
 
 const rowanjs = {
+  component: (elem) => new Component(),
   element: (elem) => new Element(elem),
   state: (value) => new State(value),
 };
