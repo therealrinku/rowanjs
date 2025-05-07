@@ -27,22 +27,29 @@ class State {
 }
 
 class Element {
-  constructor(elem) {
-    this.htmlelement = document.createElement(elem);
+  constructor(name) {
+    this.model = {
+      node: document.createElement(name),
+      children: [],
+      attributes: [],
+      eventListeners: []
+    };
   }
 
   #rerender() {
-    const parentElement = this.htmlelement.parentElement;
-    const originalElement = this.htmlelement;
+    const { node } = this.model;
+    const parentElement = node.parentElement;
+    const originalElement = node;
 
     //preserve useful states from last render
-    const scrollTop = this.htmlelement.scrollTop;
-    const scrollLeft = this.htmlelement.scrollLeft;
+    const scrollTop = node.scrollTop;
+    const scrollLeft = node.scrollLeft;
 
     this.component = this.componentFn();
+
     if (parentElement) {
-      parentElement.replaceChild(this.htmlelement, originalElement);
-      //apply last useful states
+      parentElement.replaceChild(this.component, originalElement);
+
       requestAnimationFrame(() => {
         this.htmlelement.scrollTop = scrollTop;
         this.htmlelement.scrollLeft = scrollLeft;
@@ -63,7 +70,7 @@ class Element {
 
   setText(...t) {
     t.forEach((txt) => {
-      this.htmlelement.innerText += txt;
+      this.model.node.innerText += txt;
     });
     return this;
   }
@@ -74,27 +81,27 @@ class Element {
     }
 
     // TODO: make it better?
-    this.htmlelement.innerHTML = fn() ? true : false;
+    this.model.node.innerHTML = fn() ? true : false;
     return this;
   }
 
   addClass(classNames) {
     classNames = classNames.split(" ");
-    this.htmlelement.classList.add(...classNames);
+    this.model.node.classList.add(...classNames);
     return this;
   }
 
   setValue(value) {
-    this.htmlelement.value = value;
+    this.model.node.value = value;
   }
 
   onClick(callbackFn) {
-    this.htmlelement.onclick = callbackFn;
+    this.mode.node.onclick = callbackFn;
     return this;
   }
 
   onChange(callbackFn) {
-    this.htmlelement.onchange = callbackFn;
+    this.model.node.onchange = callbackFn;
     return this;
   }
 
@@ -102,23 +109,23 @@ class Element {
     const styles = Object.entries(stylesObj);
     for (const s of styles) {
       const [key, value] = s;
-      this.htmlelement.style[key] = value;
+      this.model.node.style[key] = value;
     }
     return this;
   }
 
   setAttribute(name, value) {
-    this.htmlelement.setAttribute(name, value);
+    this.model.node.setAttribute(name, value);
     return this;
   }
 
   createRoot() {
-    document.body.appendChild(this.htmlelement);
+    document.body.appendChild(this.model.node);
     return this;
   }
 
   append(child) {
-    this.htmlelement.appendChild(child.htmlelement);
+    this.model.node.appendChild(child.model.node);
     return this;
   }
 }
