@@ -142,7 +142,7 @@ class Element {
 }
 
 const rowanjs = {
-  component: (elem) => new Component(),
+  component: (elem) => new Component(elem),
   element: (elem) => new Element(elem),
   state: (value) => new State(value),
 };
