@@ -97,7 +97,7 @@ class Component {
     const removedClassNames = new Set();
 
     newElem.classNames.forEach((value) => {
-      if (!elem.has(value)) {
+      if (!elem.classNames.has(value)) {
         addedClassNames.add(value);
       }
     });
