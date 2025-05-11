@@ -9,7 +9,7 @@ const elementDocsData = [
     examples: [
       "const element = window.rowanjs.element",
       "const root = element('div')",
-      "root.createRoot()",
+      "root.addClass('h-full w-full')",
     ],
   },
   {
@@ -47,11 +47,6 @@ const elementDocsData = [
     title: "setAttribute()",
     description: "Sets an HTML attribute on the element.",
     examples: ["elem.setAttribute('aria-label', 'Close')"],
-  },
-  {
-    title: "createRoot()",
-    description: "Mounts the element to the document body.",
-    examples: ["root.createRoot()"],
   },
   {
     title: "append()",

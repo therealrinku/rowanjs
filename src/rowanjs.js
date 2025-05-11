@@ -2,13 +2,13 @@ class Component {
   constructor(fn) {
     this.fn = fn;
     this.element = this.fn();
-    this.render(this.element.model);
+    this.#render(this.element.model);
   }
 
-  render(model) {
+  #render(model) {
     const node = document.createElement(model.nodeName);
     const childNodes = model.children.map((childNode) => {
-      return this.render(childNode.model);
+      return this.#render(childNode.model);
     });
 
     node.innerText = model.innerText;
