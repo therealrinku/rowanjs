@@ -2,7 +2,34 @@ class Component {
   constructor(fn) {
     this.fn = fn;
     this.element = this.fn();
-    this.node = this.element.render();
+    this.render(this.element.model);
+  }
+
+  render(model) {
+    const node = document.createElement(model.nodeName);
+    const childNodes = model.children.map((childNode) => {
+      return this.render(childNode.model);
+    });
+
+    node.innerText = model.innerText;
+    for (const [key, value] of model.styles) {
+      node.style[key] = value;
+    }
+    for (const className of model.classNames) {
+      node.classList.add(className);
+    }
+    for (const [name, value] of model.attributes) {
+      node.setAttribute(name, value);
+    }
+    for (const [event, callback] of model.eventListeners) {
+      node.addEventListener(event, callback);
+    }
+    for (const childNode of childNodes) {
+      node.appendChild(childNode);
+    }
+
+    this.element.model.node = node;
+    return this.element.model.node;
   }
 
   #reRender() {
@@ -11,7 +38,7 @@ class Component {
   }
 
   makeRoot() {
-    document.body.appendChild(this.node);
+    document.body.appendChild(this.element.model.node);
   }
 
   addDep(...states) {
@@ -28,7 +55,7 @@ class Component {
       if (!(component instanceof Component)) {
         throw new Error("append only takes component as a dependency");
       }
-      this.node.appendChild(component.node);
+      this.element.model.node.appendChild(component.element.model.node);
     }
   }
 }
@@ -111,32 +138,6 @@ class Element {
     return this;
   }
 
-  render() {
-    const node = document.createElement(this.model.nodeName);
-    const childNodes = this.model.children.map((childNode) => {
-      return childNode.render();
-    });
-
-    node.innerText = this.model.innerText;
-    for (const [key, value] of this.model.styles) {
-      node.style[key] = value;
-    }
-    for (const className of this.model.classNames) {
-      node.classList.add(className);
-    }
-    for (const [name, value] of this.model.attributes) {
-      node.setAttribute(name, value);
-    }
-    for (const [event, callback] of this.model.eventListeners) {
-      node.addEventListener(event, callback);
-    }
-    for (const childNode of childNodes) {
-      node.appendChild(childNode);
-    }
-
-    this.model.node = node;
-    return this.model.node;
-  }
 }
 
 const rowanjs = {
