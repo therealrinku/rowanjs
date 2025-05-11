@@ -6,8 +6,8 @@ class Component {
   }
 
   #reRender() {
-    console.log("re-rendering", this.node)
-    // TODO
+    const newElementModel = this.fn().model;
+    const oldElementModel = this.element.model;
   }
 
   makeRoot() {
@@ -48,7 +48,6 @@ class State {
   }
 
   #publish() {
-    console.log(this.subscribers, this.state, "update")
     this.subscribers.forEach((sub) => sub.callback());
   }
 
@@ -64,7 +63,7 @@ class Element {
   constructor(nodeName) {
     this.model = {
       nodeName: nodeName,
-      value: null,
+      innerText: null,
       classNames: new Set(),
       styles: new Map(),
       attributes: new Map(),
@@ -74,7 +73,7 @@ class Element {
   }
 
   setText(text) {
-    this.model.value = text;
+    this.model.innerText = text;
     return this;
   }
 
@@ -118,7 +117,7 @@ class Element {
       return childNode.render();
     });
 
-    node.innerText = this.model.value;
+    node.innerText = this.model.innerText;
     for (const [key, value] of this.model.styles) {
       node.style[key] = value;
     }

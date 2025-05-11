@@ -14,12 +14,13 @@ const elementDocsData = [
   },
   {
     title: "create()",
-    description:"Creates a new DOM element using a tag name. It's the starting point for building UI components in rowanjs.",
-    examples:[
+    description:
+      "Creates a new DOM element using a tag name. It's the starting point for building UI components in rowanjs.",
+    examples: [
       "const root = element('div')",
       "const button = element('button')",
-      "button.setText('Click me')"
-    ]
+      "button.setText('Click me')",
+    ],
   },
   {
     title: "addClass()",
@@ -56,14 +57,6 @@ const elementDocsData = [
     title: "append()",
     description: "Appends a child element to a parent.",
     examples: ["parent.append(child)"],
-  },
-  {
-    title: "showIf()",
-    description:
-      "Conditionally shows the element based on a state-derived boolean.",
-    examples: [
-      "elem.showIf({ state: visibility, fn: () => visibility.get() === true })",
-    ],
   },
   {
     title: "element()",
