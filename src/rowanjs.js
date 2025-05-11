@@ -58,7 +58,7 @@ class Component {
       parent.replaceChild(newElem.node, elem.node);
       elem.nodeName = newElem.nodeName;
     }
-    if (newElem.innerText !== oldElem.innerText) {
+    if (newElem.innerText !== elem.innerText) {
       elem.innerText = newElem.innerText;
       elem.node.innerText = newElem.innerText;
     }
