@@ -38,9 +38,9 @@ const elementDocsData = [
     examples: ['elem.setText(["hello", { state, key: "name" }])'],
   },
   {
-    title: "onClick()",
-    description: "Attaches a click handler function to the element.",
-    examples: ["elem.onClick(() => alert('clicked'))"],
+    title: "addEventListener()",
+    description: "Attaches a event handler to the element.",
+    examples: ["elem.addEventListener('click', () => alert('clicked'))"],
   },
   {
     title: "setAttribute()",

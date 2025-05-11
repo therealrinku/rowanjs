@@ -1,53 +1,35 @@
 class Component {
   constructor(fn) {
-    this.component = fn();
     this.fn = fn;
+    this.element = this.fn();
+    this.node = this.element.render();
   }
 
-  #applyDiff() {}
-
-  #findDiff() {
-    // #no fucking clue
-    const last = this.component.model;
-    const current = this.fn();
-
-    const diff = {};
-
-    //calculate diff
-    return diff;
+  #reRender() {
+    console.log("re-rendering", this.node)
+    // TODO
   }
 
-  #rerender() {
-    const diff = this.#findDiff();
-    this.#applyDiff(diff);
-  }
-
-  get(){
-    return this;
-  }
-
-  appendElement(...elements) {
-    elements.forEach((element) => {
-      if (!(element instanceof Component)) {
-        throw new Error("append() method only takes Component as an argument.");
-      }
-
-      this.component.model.node.appendChild(element.get().component.model.node);
-      this.component.model.children.push(element.get().component.model.node);
-    });
-    return this;
+  makeRoot() {
+    document.body.appendChild(this.node);
   }
 
   addDep(...states) {
-    states.forEach((state) => {
+    for (const state of states) {
       if (!(state instanceof State)) {
-        throw new Error("addDep() method only takes State as an argument.");
+        throw new Error("addDep only takes state as a dependency");
       }
+      state.subscribe({ callback: () => this.#reRender() });
+    }
+  }
 
-      state.subscribe({ callback: () => this.#rerender() });
-    });
-
-    return this;
+  appendComponent(...components) {
+    for (const component of components) {
+      if (!(component instanceof Component)) {
+        throw new Error("append only takes component as a dependency");
+      }
+      this.node.appendChild(component.node);
+    }
   }
 }
 
@@ -62,12 +44,11 @@ class State {
   }
 
   subscribe(elem) {
-    // TODO: ability to subscribe to inner properties changes only
     this.subscribers.push(elem);
   }
 
   #publish() {
-    // TODO: publish only when specified inner properties changes if provided
+    console.log(this.subscribers, this.state, "update")
     this.subscribers.forEach((sub) => sub.callback());
   }
 
@@ -80,85 +61,87 @@ class State {
 }
 
 class Element {
-  constructor(name) {
+  constructor(nodeName) {
     this.model = {
-      node: document.createElement(name),
-      children: new Array(),
-      attributes: new Map(),
-      eventListeners: new Map(),
+      nodeName: nodeName,
+      value: null,
       classNames: new Set(),
       styles: new Map(),
+      attributes: new Map(),
+      eventListeners: new Map(),
+      children: new Array(),
     };
   }
 
-  setText(...t) {
-    t.forEach((txt) => {
-      this.model.node.innerText += txt;
-    });
-
-    return this;
-  }
-
-  showIf(fn) {
-    if (typeof fn !== "function") {
-      throw new Error("showIf() only takes function argument.");
-    }
-
-    // TODO: make it better?
-    this.model.node.innerHTML = fn() ? true : false;
+  setText(text) {
+    this.model.value = text;
     return this;
   }
 
   addClass(classNames) {
     classNames = classNames.split(" ");
-    this.model.node.classList.add(...classNames);
-    this.model.classNames.add(...classNames);
-
+    classNames.forEach((cls) => this.model.classNames.add(cls));
     return this;
   }
 
   addStyles(stylesObj) {
     const styles = Object.entries(stylesObj);
-
     for (const s of styles) {
       const [key, value] = s;
-      this.model.node.style[key] = value;
       this.model.styles.set(key, value);
     }
-
     return this;
   }
 
   setAttribute(name, value) {
-    this.model.node.setAttribute(name, value);
     this.model.attributes.set(name, value);
-
     return this;
   }
 
   addEventListener(event, callback) {
-    this.model.node.addEventListener(event, callback);
     this.model.eventListeners.set(event, callback);
-
-    return this;
-  }
-
-  createRoot() {
-    document.body.appendChild(this.model.node);
-
     return this;
   }
 
   append(child) {
-    this.model.node.appendChild(child.model.node);
-    this.model.children.push(child);
+    if (!(child instanceof Element)) {
+      throw new Error("append only takes element");
+    }
 
+    this.model.children.push(child);
     return this;
+  }
+
+  render() {
+    const node = document.createElement(this.model.nodeName);
+    const childNodes = this.model.children.map((childNode) => {
+      return childNode.render();
+    });
+
+    node.innerText = this.model.value;
+    for (const [key, value] of this.model.styles) {
+      node.style[key] = value;
+    }
+    for (const className of this.model.classNames) {
+      node.classList.add(className);
+    }
+    for (const [name, value] of this.model.attributes) {
+      node.setAttribute(name, value);
+    }
+    for (const [event, callback] of this.model.eventListeners) {
+      node.addEventListener(event, callback);
+    }
+    for (const childNode of childNodes) {
+      node.appendChild(childNode);
+    }
+
+    this.model.node = node;
+    return this.model.node;
   }
 }
 
 const rowanjs = {
-  component: (elem) => new Component(elem),
+  component: (fn) => new Component(fn),
   element: (elem) => new Element(elem),
   state: (value) => new State(value),
 };

@@ -11,8 +11,6 @@ import { installationDocs } from "./components/installation-docs.js";
 const root = component(() => {
   const rootElem = element("div");
   rootElem.addClass("flex flex-row");
-  rootElem.createRoot();
-
   return rootElem;
 });
 
@@ -29,7 +27,7 @@ stateDocs.addDep(selectedDocItem);
 componentDocs.addDep(selectedDocItem);
 installationDocs.addDep(selectedDocItem);
 
-main.appendElement(elementDocs, stateDocs, componentDocs, installationDocs);
-root.appendElement(sidebar, main, topbar);
+main.appendComponent(elementDocs, stateDocs, componentDocs, installationDocs);
+root.appendComponent(sidebar, main, topbar);
 
-root.get().createRoot();
+root.makeRoot();

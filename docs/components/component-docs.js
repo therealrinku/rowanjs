@@ -16,14 +16,14 @@ const componentDocsData = [
     ],
   },
   {
-    title: "appendElement()",
+    title: "appendComponent()",
     description:
       "Appends one or more child components to the current component. Accepts multiple components as parameters.",
     examples: [
       "// Append a single component",
-      "parent.appendElement(child);",
+      "parent.appendComponent(child);",
       "// Append multiple components",
-      "parent.appendElement(header, content, footer);",
+      "parent.appendComponent(header, content, footer);",
     ],
   },
   {

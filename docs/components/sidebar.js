@@ -4,18 +4,16 @@ import { searchState } from "../state-store.js";
 
 const sidebarData = {
   Core: ["Installation", "Component", "State", "Element"],
-  "Component API": ["appendElement()", "getElement()", "addDep()"],
+  "Component API": ["appendComponent()", "getElement()", "addDep()"],
   "State API": ["set()", "get()"],
   "Element API": [
     "create()",
     "addClass()",
     "addStyles()",
     "setText()",
-    "onClick()",
+    "addEventListener()",
     "setAttribute()",
-    "createRoot()",
     "append()",
-    "showIf()",
   ],
 };
 
@@ -29,7 +27,7 @@ function createAndAppendSection(title, root) {
 function createAndAppendDocButton(title, root) {
   const elem = element("button");
   elem.setText(title);
-  elem.addEventListener("onclick", () => selectedDocItem.set(title));
+  elem.addEventListener("click", () => selectedDocItem.set(title));
 
   const active = selectedDocItem.get() === title;
   if (active) {
