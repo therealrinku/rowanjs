@@ -2,10 +2,10 @@ class Component {
   constructor(fn) {
     this.fn = fn;
     this.element = this.fn();
-    this.#render(this.element.model);
+    this.#render();
   }
 
-  #render(model) {
+  #render(model = this.element.model) {
     const node = document.createElement(model.nodeName);
     const childNodes = model.children.map((childNode) => {
       return this.#render(childNode.model);
@@ -32,9 +32,149 @@ class Component {
     return this.element.model.node;
   }
 
-  #reRender() {
-    const newElementModel = this.fn().model;
-    const oldElementModel = this.element.model;
+  #reRender(newElem, elem, parent) {
+    const c1 = elem.children.length;
+    const c2 = newElem.children.length;
+
+    for (let i = 0; i < Math.max(c1, c2); i++) {
+      this.#reRender(
+        newElem.children[i]?.model,
+        elem.children[i]?.model,
+        newElem,
+      );
+    }
+
+    // base case
+    if (!newElem && !elem) {
+      return;
+    }
+
+    if (newElem && !elem && parent) {
+      parent.node.appendChild(newElem.node);
+      parent.model.children.push(newElem);
+    }
+    if (newElem.nodeName !== elem.nodeName) {
+      const parent = elem.node.parentElement;
+      parent.replaceChild(newElem.node, elem.node);
+      elem.nodeName = newElem.nodeName;
+    }
+    if (newElem.innerText !== oldElem.innerText) {
+      elem.innerText = newElem.innerText;
+      elem.node.innerText = newElem.innerText;
+    }
+
+    // styles
+    const addedStyles = new Map();
+    const removedStyles = new Map();
+    const updatedStyles = new Map();
+
+    newElem.styles.forEach((value, key, map) => {
+      if (!elem.styles.has(key)) {
+        addedStyles.set(key, value);
+      }
+    });
+    elem.styles.forEach((value, key, map) => {
+      if (!newElem.styles.has(key)) {
+        removedStyles.set(key, value);
+      } else if (newElem.styles.get(key) !== map.get(key)) {
+        updatedStyles.set(key, newElem.styles.get(key));
+      }
+    });
+    for (const [key, value] of addedStyles) {
+      elem.node.styles[key] = value;
+      elem.styles.set(key, value);
+    }
+    for (const [key, value] of updatedStyles) {
+      elem.node.styles[key] = value;
+      elem.styles.set(key, value);
+    }
+    for (const [key, value] of removedStyles) {
+      delete elem.node.styles[key];
+    }
+
+    //classnames
+    const addedClassNames = new Set();
+    const removedClassNames = new Set();
+
+    newElem.classNames.forEach((value) => {
+      if (!elem.has(value)) {
+        addedClassNames.add(value);
+      }
+    });
+    elem.styles.forEach((value) => {
+      if (!newElem.classNames.has(value)) {
+        removedClassNames.add(value);
+      }
+    });
+    addedClassNames.forEach((cls) => {
+      elem.classNames.add(cls);
+      elem.node.classList.add(cls);
+    });
+    removedClassNames.forEach((cls) => {
+      elem.classNames.delete(cls);
+      elem.node.classList.remove(cls);
+    });
+
+    //attribures,
+    const addedAttributes = new Map();
+    const removedAttributes = new Map();
+    const updatedAttributes = new Map();
+
+    newElem.attributes.forEach((value, key, map) => {
+      if (!elem.attributes.has(key)) {
+        addedAttributes.set(key, value);
+      }
+    });
+    elem.attributes.forEach((value, key, map) => {
+      if (!newElem.attributes.has(key)) {
+        removedAttributes.set(key, value);
+      } else if (newElem.attributes.get(key) !== map.get(key)) {
+        updatedAttributes.set(key, newElem.attributes.get(key));
+      }
+    });
+    for (const [key, value] of addedAttributes) {
+      elem.node.setAttribute(key, value);
+      elem.attributes.set(key, value);
+    }
+    for (const [key, value] of updatedAttributes) {
+      elem.node.setAttribute(key, value);
+      elem.attributes.set(key, value);
+    }
+    for (const [key, value] of removedAttributes) {
+      elem.node.removeAttribute(key);
+      elem.attributes.delete(key);
+    }
+
+    //eventlistenres
+    const addedEventListeners = new Map();
+    const removedEventListeners = new Map();
+    const updatedEventListeners = new Map();
+
+    newElem.eventListeners.forEach((value, key, map) => {
+      if (!elem.eventListeners.has(key)) {
+        addedEventListeners.set(key, value);
+      }
+    });
+    elem.eventListeners.forEach((value, key, map) => {
+      if (!newElem.eventListeners.has(key)) {
+        removedEventListeners.set(key, value);
+      } else if (newElem.eventListeners.get(key) !== map.get(key)) {
+        updatedEventListeners.set(key, newElem.eventListeners.get(key));
+      }
+    });
+    for (const [key, value] of addedEventListeners) {
+      elem.node.addEventListener(key, value);
+      elem.eventListeners.set(key, value);
+    }
+    for (const [key, value] of updatedEventListeners) {
+      elem.node.removeEventListener(key, elem.eventListeners.get(key));
+      elem.node.addEventListener(key, value);
+      elem.eventListeners.set(key, value);
+    }
+    for (const [key, value] of removedEventListeners) {
+      elem.node.removeEventListener(key, elem.eventListeners.get(key));
+      elem.eventListeners.remove(key);
+    }
   }
 
   makeRoot() {
@@ -46,7 +186,11 @@ class Component {
       if (!(state instanceof State)) {
         throw new Error("addDep only takes state as a dependency");
       }
-      state.subscribe({ callback: () => this.#reRender() });
+      state.subscribe({
+        callback: () => {
+          this.#reRender(this.fn().model, this.element.model);
+        },
+      });
     }
   }
 
@@ -137,7 +281,6 @@ class Element {
     this.model.children.push(child);
     return this;
   }
-
 }
 
 const rowanjs = {
