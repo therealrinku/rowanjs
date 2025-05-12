@@ -35,7 +35,6 @@ class Component {
   #reRender(newElem, elem, parent) {
     const c1 = elem.children.length;
     const c2 = newElem.children.length;
-
     for (let i = 0; i < Math.max(c1, c2); i++) {
       this.#reRender(
         newElem.children[i]?.model,
