@@ -33,13 +33,14 @@ class Component {
   }
 
   #reRender(newElem, elem, parent) {
-    const c1 = elem.children.length;
-    const c2 = newElem.children.length;
+    const c1 = elem?.children?.length || 0;
+    const c2 = newElem?.children?.length || 0;
+
     for (let i = 0; i < Math.max(c1, c2); i++) {
       this.#reRender(
         newElem.children[i]?.model,
         elem.children[i]?.model,
-        newElem,
+        elem,
       );
     }
 
@@ -48,10 +49,24 @@ class Component {
       return;
     }
 
+    // if this child is new, append it
     if (newElem && !elem && parent) {
       parent.node.appendChild(newElem.node);
       parent.model.children.push(newElem);
     }
+    // if this child is removed in new render, remove it
+    if (!newElem && elem && parent) {
+      parent.node.removeChild(elem.node);
+      const index = parent.model.children.findIndex((child) => child.model === elem);
+      if (index !== -1) {
+        parent.model.children.splice(index, 1);
+      }
+    }
+
+    if(!newElem || !elem){
+      return;
+    }
+
     if (newElem.nodeName !== elem.nodeName) {
       const parent = elem.node.parentElement;
       parent.replaceChild(newElem.node, elem.node);
@@ -172,7 +187,7 @@ class Component {
     }
     for (const [key, value] of removedEventListeners) {
       elem.node.removeEventListener(key, elem.eventListeners.get(key));
-      elem.eventListeners.remove(key);
+      elem.eventListeners.delete(key);
     }
   }
 
