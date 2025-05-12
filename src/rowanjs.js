@@ -28,8 +28,8 @@ class Component {
       node.appendChild(childNode);
     }
 
-    this.element.model.node = node;
-    return this.element.model.node;
+    model.node = node;
+    return model.node;
   }
 
   #reRender(newElem, elem, parent) {
@@ -101,7 +101,7 @@ class Component {
         addedClassNames.add(value);
       }
     });
-    elem.styles.forEach((value) => {
+    elem.classNames.forEach((value) => {
       if (!newElem.classNames.has(value)) {
         removedClassNames.add(value);
       }
