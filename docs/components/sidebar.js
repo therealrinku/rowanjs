@@ -45,7 +45,7 @@ export const sidebar = component(() => {
 
   const input = element("input");
   input.setAttribute("value", searchState.get());
-  input.addEventListener("change", (e) => searchState.set(e.target.value));
+  input.addEventListener("input", (e) => searchState.set(e.target.value));
   input.setAttribute("placeholder", "search...");
   input.addClass(
     "border border-gray-500 w-full min-h-12 max-h-12 outline-none px-2",
