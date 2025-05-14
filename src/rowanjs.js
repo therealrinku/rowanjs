@@ -33,44 +33,55 @@ class Component {
   }
 
   #reRender(newElem, elem, parent) {
-    const c1 = elem?.children?.length || 0;
-    const c2 = newElem?.children?.length || 0;
-
-    for (let i = 0; i < Math.max(c1, c2); i++) {
-      this.#reRender(
-        newElem.children[i]?.model,
-        elem.children[i]?.model,
-        elem,
-      );
-    }
-
-    // base case
     if (!newElem && !elem) {
       return;
     }
 
-    // if this child is new, append it
-    if (newElem && !elem && parent) {
-      parent.node.appendChild(newElem.node);
-      parent.model.children.push(newElem);
-    }
-    // if this child is removed in new render, remove it
-    if (!newElem && elem && parent) {
-      parent.node.removeChild(elem.node);
-      const index = parent.model.children.findIndex((child) => child.model === elem);
-      if (index !== -1) {
-        parent.model.children.splice(index, 1);
+    // Handle child elements
+    // very unperformant right now!! obviously!
+    if (newElem && elem) {
+      const c1 = elem?.children?.length || 0;
+      const c2 = newElem?.children?.length || 0;
+
+      // append new child
+      for (let i = 0; i < c2; i++) {
+        this.#reRender(newElem.children?.[i]?.model, null, elem);
+      }
+
+      // remove old child
+      for (let i = c1 - 1; i >= 0; i--) {
+        this.#reRender(null, elem.children?.[i]?.model, elem);
       }
     }
 
-    if(!newElem || !elem){
+    // if this child is new, append it
+    if (newElem && !elem && parent) {
+      const updatedNewElem = this.#render(newElem);
+      const childModelRef = { model: newElem };
+      newElem.node = updatedNewElem;
+      parent.children.push(childModelRef);
+      parent.node.appendChild(updatedNewElem);
+      return;
+    }
+
+    // if this child is removed in new render, remove it
+    if (!newElem && elem && parent) {
+      parent.node.removeChild(elem.node);
+      const index = parent.children.findIndex((child) => child.model === elem);
+      if (index !== -1) {
+        parent.children.splice(index, 1);
+      }
       return;
     }
 
     if (newElem.nodeName !== elem.nodeName) {
-      const parent = elem.node.parentElement;
-      parent.replaceChild(newElem.node, elem.node);
       elem.nodeName = newElem.nodeName;
+      parent.node.removeChild(elem.node);
+      const updatedNewElem = this.#render(newElem);
+      newElem.node = updatedNewElem;
+      const childModelRef = { model: newElem };
+      const idx = parent.children.findIndex((child) => child.model === elem);
+      parent.children.splice(idx, 1, childModelRef);
     }
     if (newElem.innerText !== elem.innerText) {
       elem.innerText = newElem.innerText;
