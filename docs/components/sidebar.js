@@ -7,7 +7,6 @@ const sidebarData = {
   "Component API": ["appendComponent()", "getElement()", "addDep()"],
   "State API": ["set()", "get()"],
   "Element API": [
-    "create()",
     "addClass()",
     "addStyles()",
     "setText()",

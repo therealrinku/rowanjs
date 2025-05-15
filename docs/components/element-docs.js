@@ -13,16 +13,6 @@ const elementDocsData = [
     ],
   },
   {
-    title: "create()",
-    description:
-      "Creates a new DOM element using a tag name. It's the starting point for building UI components in rowanjs.",
-    examples: [
-      "const root = element('div')",
-      "const button = element('button')",
-      "button.setText('Click me')",
-    ],
-  },
-  {
     title: "addClass()",
     description: "Adds one or more Tailwind/CSS classes to the element.",
     examples: ['elem.addClass("bg-red-500 text-white")'],
