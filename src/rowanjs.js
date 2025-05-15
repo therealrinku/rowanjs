@@ -258,6 +258,7 @@ class State {
 class Element {
   constructor(nodeName) {
     this.model = {
+      key: null,
       nodeName: nodeName,
       innerText: null,
       classNames: new Set(),
@@ -290,6 +291,11 @@ class Element {
 
   setAttribute(name, value) {
     this.model.attributes.set(name, value);
+    return this;
+  }
+
+  setKey(key){
+    this.model.key = key;
     return this;
   }
 

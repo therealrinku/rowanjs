@@ -14,12 +14,14 @@ const sidebarData = {
     "addEventListener()",
     "setAttribute()",
     "append()",
+    "setKey()",
   ],
 };
 
-function createAndAppendSection(title, root) {
+function createAndAppendSection(title, root, idx) {
   const section = element("p");
   section.setText(title);
+  section.setKey(`${section}-${idx}`); // important for children re-render logic
   section.addClass("font-bold mt-3");
   root.append(section);
 }
@@ -69,11 +71,13 @@ export const sidebar = component(() => {
     return [title, filteredSectionTitles];
   });
 
+  let idx = 0;
   for (const [section, buttons] of filteredSidebarData) {
     if (buttons.length > 0) {
-      createAndAppendSection(section, sidebarElem);
+      createAndAppendSection(section, sidebarElem, idx);
       buttons.forEach((title) => createAndAppendDocButton(title, sidebarElem));
     }
+    idx++;
   }
 
   return sidebarElem;

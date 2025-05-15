@@ -54,6 +54,11 @@ const elementDocsData = [
     examples: ["parent.append(child)"],
   },
   {
+    title: "setKey()",
+    description: "set a unique key of child element - important for re-render",
+    examples: ["element.setKey(stringKey)"],
+  },
+  {
     title: "element()",
     description:
       "Creates a new DOM element using a tag name. It's the starting point for building UI components in rowanjs.",
